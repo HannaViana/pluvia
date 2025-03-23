@@ -1,0 +1,8 @@
+# Ignore all .ipynb_checkpoints directories
+.ipynb_checkpoints
+
+# Ignore the /data directory
+# /data
+
+# Ignore /auth credentials directory
+/auth
