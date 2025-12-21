@@ -81,7 +81,7 @@ def create_duration_distribution_chart_by_type(ocorrencias_type, event_types_lis
                 fontsize=FONT_SIZES['title'], fontweight='bold', y=1.02)
     
     # Panel A: Histogram with statistics
-    n, bins, patches = ax1.hist(durations_filtered, bins=30, color=COLORS['primary'],
+    n, bins, patches = ax1.hist(durations_filtered, bins=24, color=COLORS['primary'],
                                 edgecolor='black', linewidth=0.5, alpha=0.7)
     
     # Add vertical lines for statistics
