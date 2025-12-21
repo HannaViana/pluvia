@@ -56,7 +56,9 @@ def main():
         'chart_06_duration_distribution.py',
         'chart_07a_duration_by_type.py',
         'chart_07b_duration_by_season.py',
-        'chart_08_duration_categories.py'
+        'chart_08_duration_categories.py',
+        'chart_09_duration_distribution_by_type.py',
+        'chart_10_duration_categories_by_type.py'
     ]
     
     results = {}

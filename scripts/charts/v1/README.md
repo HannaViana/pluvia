@@ -7,9 +7,11 @@ This directory contains improved chart generation scripts designed for scientifi
 ## Key Improvements
 
 ### 1. **Consolidated Chart Set**
-- **Reduced from 8 to 4 charts** by eliminating redundancy
+- **Expanded to 11 chart scripts** (from original 5) generating 14 total images with duration analysis
 - Each chart provides unique, complementary insights
 - Better narrative flow and logical progression
+- Duration analysis split into focused, interpretable visualizations
+- Event type-specific analysis for detailed comparisons (combined and separate views)
 
 ### 2. **Enhanced Statistical Rigor**
 - **Confidence intervals** (95% CI) for temporal patterns
@@ -123,26 +125,151 @@ This directory contains improved chart generation scripts designed for scientifi
 
 ---
 
+### Chart 6: Event Duration Distribution
+**File:** [`chart_06_duration_distribution.py`](chart_06_duration_distribution.py)
+**Output:** `results/charts/v1/chart_06a_duration_distribution.png`, `results/charts/v1/chart_06b_duration_by_hour.png`
+
+**New addition:**
+- **Part 1 (Panels a & b):** Histogram and CDF for events < 12 hours
+- **Part 2:** Average duration by hour of day
+- Comprehensive duration statistics with mean, median, and percentiles
+- Filter annotation showing events < 12 hours vs total
+
+**Key findings:**
+- Duration distribution heavily skewed toward short events
+- Most events resolve within a few hours
+- Hourly variation in average event duration
+
+---
+
+### Chart 7a: Event Duration by Type
+**File:** [`chart_07a_duration_by_type.py`](chart_07a_duration_by_type.py)
+**Output:** `results/charts/v1/chart_07a_duration_by_type.png`
+
+**New addition:**
+- **Panel (a):** Box plot by event type (< 12 hours only)
+- **Panel (b):** Mean duration by event type with error bars (all data)
+- Kruskal-Wallis test for statistical comparison
+- Sample sizes displayed for each event type
+
+**Key findings:**
+- Significant differences in duration across event types
+- Box plots reveal distribution characteristics for short-duration events
+- Mean durations provide overall comparison including longer events
+
+---
+
+### Chart 7b: Event Duration by Season
+**File:** [`chart_07b_duration_by_season.py`](chart_07b_duration_by_season.py)
+**Output:** `results/charts/v1/chart_07b_duration_by_season.png`
+
+**New addition:**
+- **Panel (a):** Box plot by season (< 12 hours only)
+- **Panel (b):** Violin plot showing distribution by season (< 12 hours only)
+- Season-specific color coding
+- Sample sizes displayed for each season
+
+**Key findings:**
+- Seasonal variations in event duration patterns
+- Violin plots reveal distribution shapes and multimodality
+- Both panels filtered to < 12 hours for focus on typical events
+
+---
+
+### Chart 8: Event Duration Categories
+**File:** [`chart_08_duration_categories.py`](chart_08_duration_categories.py)
+**Output:** `results/charts/v1/chart_08_duration_categories.png`
+
+**New addition:**
+- Granular categorization of event durations
+- More detailed breakdown for 1-6 hour range
+- Counts and percentages for each category
+- Gradient color scheme indicating duration length
+
+**Key findings:**
+- Clear distribution across duration categories
+- Majority of events in specific duration ranges
+- Useful for operational planning and response
+
+---
+
+### Chart 9: Event Duration Distribution by Type
+**File:** [`chart_09_duration_distribution_by_type.py`](chart_09_duration_distribution_by_type.py)
+**Output:**
+- `results/charts/v1/chart_09_duration_distribution_bolsao_and_lamina.png`
+- `results/charts/v1/chart_09_duration_distribution_alagamento.png`
+
+**New addition:**
+- Based on Chart 6a design
+- **Two charts:** one combining "Bolsão d'água em via" and "Lâmina d'água", another for "Alagamento"
+- Each chart has **Panel (a):** Histogram and **Panel (b):** CDF for events < 12 hours
+- Comprehensive duration statistics with mean, median, and percentiles
+- Filter annotation showing events < 12 hours vs total
+
+**Key findings:**
+- Event type-specific duration patterns revealed
+- "Alagamento" events show significantly longer durations compared to other types
+- "Bolsão d'água" and "Lâmina d'água" have similar duration characteristics
+- Useful for resource allocation and response planning by event type
+
+---
+
+### Chart 10: Event Duration Categories by Type
+**File:** [`chart_10_duration_categories_by_type.py`](chart_10_duration_categories_by_type.py)
+**Output:**
+- `results/charts/v1/chart_10_duration_categories_bolsao_and_lamina.png`
+- `results/charts/v1/chart_10_duration_categories_alagamento.png`
+
+**New addition:**
+- Based on Chart 8 design
+- **Two charts:** one combining "Bolsão d'água em via" and "Lâmina d'água", another for "Alagamento"
+- Granular categorization of event durations (< 1h, 1-2h, 2-3h, etc.)
+- Counts and percentages for each category
+- Gradient color scheme indicating duration length
+
+**Key findings:**
+- Event type-specific distribution across duration categories
+- "Alagamento" events more evenly distributed across longer duration categories
+- "Bolsão d'água" and "Lâmina d'água" concentrated in shorter duration ranges (1-3 hours)
+- Critical for developing type-specific response protocols
+
+---
+
 ## File Structure
 
 ```
 scripts/charts/v1/
-├── README.md                          # This file
-├── config.py                          # Unified configuration module
-├── chart_01_event_types.py           # Event type distribution
-├── chart_02_temporal_patterns.py     # Monthly & seasonal patterns
-├── chart_03_hourly_distribution.py   # Hourly distribution (overall)
-├── chart_04_spatial_coverage.py      # Distance to stations
-├── chart_05_hourly_by_season.py      # Hourly distribution by season
-├── generate_all_charts.py            # Master script
-└── requirements.txt                   # Python dependencies
+├── README.md                                # This file
+├── config.py                                # Unified configuration module
+├── chart_01_event_types.py                 # Event type distribution
+├── chart_02_temporal_patterns.py           # Monthly & seasonal patterns
+├── chart_03_hourly_distribution.py         # Hourly distribution (overall)
+├── chart_04_spatial_coverage.py            # Distance to stations
+├── chart_05_hourly_by_season.py            # Hourly distribution by season
+├── chart_06_duration_distribution.py       # Duration distribution (histogram & CDF)
+├── chart_07a_duration_by_type.py           # Duration by event type
+├── chart_07b_duration_by_season.py         # Duration by season
+├── chart_08_duration_categories.py         # Duration categories
+├── chart_09_duration_distribution_by_type.py  # Duration distribution per event type (3 charts)
+├── chart_10_duration_categories_by_type.py    # Duration categories per event type (3 charts)
+├── generate_all_charts.py                  # Master script
+└── requirements.txt                         # Python dependencies
 
 results/charts/v1/
 ├── chart_01_event_types.png
 ├── chart_02_temporal_patterns.png
 ├── chart_03_hourly_distribution.png
 ├── chart_04_spatial_coverage.png
-└── chart_05_hourly_by_season.png
+├── chart_05_hourly_by_season.png
+├── chart_06a_duration_distribution.png
+├── chart_06b_duration_by_hour.png
+├── chart_07a_duration_by_type.png
+├── chart_07b_duration_by_season.png
+├── chart_08_duration_categories.png
+├── chart_09_duration_distribution_bolsao_and_lamina.png
+├── chart_09_duration_distribution_alagamento.png
+├── chart_10_duration_categories_bolsao_and_lamina.png
+└── chart_10_duration_categories_alagamento.png
 ```
 
 ## Usage
@@ -163,6 +290,12 @@ results/charts/v1/
 ./venv/bin/python scripts/charts/v1/chart_03_hourly_distribution.py
 ./venv/bin/python scripts/charts/v1/chart_04_spatial_coverage.py
 ./venv/bin/python scripts/charts/v1/chart_05_hourly_by_season.py
+./venv/bin/python scripts/charts/v1/chart_06_duration_distribution.py
+./venv/bin/python scripts/charts/v1/chart_07a_duration_by_type.py
+./venv/bin/python scripts/charts/v1/chart_07b_duration_by_season.py
+./venv/bin/python scripts/charts/v1/chart_08_duration_categories.py
+./venv/bin/python scripts/charts/v1/chart_09_duration_distribution_by_type.py
+./venv/bin/python scripts/charts/v1/chart_10_duration_categories_by_type.py
 ```
 
 ## Dependencies
@@ -203,8 +336,9 @@ To modify styling across all charts, edit [`config.py`](config.py).
 | Chart 7 (Monthly) | Duplicate of Chart 3 | **Removed** (redundant) |
 | Chart 8 (Distance) | Histogram only, no CDF | Chart 4: Histogram + CDF with coverage |
 | - | Missing seasonal hourly analysis | Chart 5: Hourly by season (NEW) |
+| - | Missing duration analysis | Charts 6, 7a, 7b, 8, 9, 10: Duration analysis (NEW) |
 
-**Result:** 8 charts → 5 charts with more information, better design, and new insights
+**Result:** 8 original charts → 11 chart scripts generating 14 images with duration analysis, better design, and new insights
 
 ## Scientific Publication Checklist
 
