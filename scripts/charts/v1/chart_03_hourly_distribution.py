@@ -81,17 +81,9 @@ def create_hourly_distribution_chart(ocorrencias):
     ax.set_axisbelow(True)
     ax.legend(loc='upper left', fontsize=FONT_SIZES['legend'])
     
-    # Add chi-square test result
-    sig_text = f'χ² = {chi2:.2f}, p < 0.001' if p_value < 0.001 else f'χ² = {chi2:.2f}, p = {p_value:.4f}'
-    if p_value < ALPHA:
-        sig_text += ' *'
-    ax.text(0.98, 0.85, sig_text, transform=ax.transAxes, fontsize=FONT_SIZES['annotation'],
-            verticalalignment='top', horizontalalignment='right',
-            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray'))
-    
     # Add peak hours annotation
     peak_text = f'Peak hours: {", ".join([f"{h:02d}:00" for h in peak_hours])}'
-    ax.text(0.98, 0.75, peak_text, transform=ax.transAxes, fontsize=FONT_SIZES['annotation'],
+    ax.text(0.98, 0.82, peak_text, transform=ax.transAxes, fontsize=FONT_SIZES['annotation'],
             verticalalignment='top', horizontalalignment='right',
             bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8, edgecolor='gray'))
     

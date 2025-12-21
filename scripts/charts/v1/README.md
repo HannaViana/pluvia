@@ -13,9 +13,8 @@ This directory contains improved chart generation scripts designed for scientifi
 
 ### 2. **Enhanced Statistical Rigor**
 - **Confidence intervals** (95% CI) for temporal patterns
-- **Chi-square tests** for distribution uniformity
 - **Sample sizes** clearly displayed on all charts
-- **Significance markers** (p-values) included where appropriate
+- Statistical tests performed during analysis (not displayed on charts for clarity)
 
 ### 3. **Improved Visual Design**
 - **Unified color palette** (colorblind-friendly from ColorBrewer)
@@ -61,15 +60,14 @@ This directory contains improved chart generation scripts designed for scientifi
 
 **Improvements over original:**
 - **Panel (a):** Monthly distribution with 95% confidence intervals
-- **Panel (b):** Seasonal distribution with chi-square test
+- **Panel (b):** Seasonal distribution with clear visual comparison
 - Eliminates redundancy (combined 5 temporal charts into 1)
-- Statistical significance testing (χ² = 2003.09, p < 0.001)
 - Non-negative confidence bounds
 
 **Key findings:**
 - Strong seasonal pattern (Summer: 47.9%, Winter: 6.3%)
 - Peak months: February (108 events avg), March (87), January (74)
-- Statistically significant seasonal variation
+- Clear seasonal variation in flood occurrence
 
 ---
 
@@ -80,11 +78,10 @@ This directory contains improved chart generation scripts designed for scientifi
 **Improvements over original:**
 - Mean and threshold lines (mean + 1σ)
 - Peak hours highlighted in red
-- Chi-square test for uniformity
-- Statistical annotations
+- Clear identification of peak and low activity periods
 
 **Key findings:**
-- Strong diurnal pattern (χ² = 902.34, p < 0.001)
+- Strong diurnal pattern with evening concentration
 - Peak hours: 17:00-21:00 (evening rush hour)
 - Minimum: 03:00-08:00 (early morning)
 - Potential reporting bias during business hours
@@ -115,7 +112,6 @@ This directory contains improved chart generation scripts designed for scientifi
 **New addition:**
 - **Four-panel figure** (2x2 grid) showing hourly patterns for each season
 - Each panel includes mean, threshold lines, and peak hour identification
-- Chi-square tests for each season
 - Season-specific color coding with peak hours highlighted
 
 **Key findings:**
@@ -123,7 +119,7 @@ This directory contains improved chart generation scripts designed for scientifi
 - **Autumn (N=1,534):** Evening peak shifts later (19:00-22:00), 113 events at 20:00
 - **Winter (N=307):** Weaker pattern, morning peak (06:00-07:00), 26 events at 16:00
 - **Spring (N=697):** Mixed pattern with peaks at 10:00, 17:00, and 22:00
-- All seasons show significant non-uniform distributions (p < 0.001)
+- All seasons show distinct non-uniform hourly distributions
 
 ---
 
@@ -202,8 +198,8 @@ To modify styling across all charts, edit [`config.py`](config.py).
 | Original | Issues | Improved Version |
 |----------|--------|------------------|
 | Chart 1 (Pie) | Pie chart, no context | Chart 1: Bar chart with percentages |
-| Chart 2-5 (Temporal) | Redundant, no statistics | Chart 2: Combined with CI & χ² test |
-| Chart 6 (Hourly) | No error bars, no significance | Chart 3: With statistics & peak hours |
+| Chart 2-5 (Temporal) | Redundant, no statistics | Chart 2: Combined with CI & visual comparison |
+| Chart 6 (Hourly) | No error bars, no peak identification | Chart 3: With mean lines & peak hours |
 | Chart 7 (Monthly) | Duplicate of Chart 3 | **Removed** (redundant) |
 | Chart 8 (Distance) | Histogram only, no CDF | Chart 4: Histogram + CDF with coverage |
 | - | Missing seasonal hourly analysis | Chart 5: Hourly by season (NEW) |
@@ -216,8 +212,8 @@ To modify styling across all charts, edit [`config.py`](config.py).
 - [x] Colorblind-friendly palette
 - [x] Consistent typography
 - [x] Sample sizes displayed
-- [x] Statistical tests included
-- [x] Confidence intervals shown
+- [x] Statistical tests performed in analysis
+- [x] Confidence intervals shown (where applicable)
 - [x] Subfigure labels (a, b, c)
 - [x] Comprehensive titles with context
 - [x] Clear axis labels with units
@@ -230,7 +226,7 @@ To modify styling across all charts, edit [`config.py`](config.py).
 1. **Figure Captions:** Add detailed captions in your manuscript explaining each panel and key findings
 
 2. **Statistical Reporting:** Include the following in your methods section:
-   - Chi-square tests for distribution uniformity
+   - Statistical tests were performed to assess distribution patterns (results available in analysis scripts)
    - 95% confidence intervals for temporal averages
    - Distance calculations using SIRGAS 2000 / UTM zone 23S projection
 

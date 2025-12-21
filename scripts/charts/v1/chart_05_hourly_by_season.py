@@ -136,15 +136,6 @@ def create_hourly_by_season_chart(ocorrencias):
         ax.set_axisbelow(True)
         ax.legend(loc='upper left', fontsize=FONT_SIZES['annotation'])
         
-        # Add chi-square test result
-        sig_text = f'χ² = {chi2:.1f}, p < 0.001' if p_value < 0.001 else f'χ² = {chi2:.1f}, p = {p_value:.3f}'
-        if p_value < ALPHA:
-            sig_text += ' *'
-        ax.text(0.98, 0.98, sig_text, transform=ax.transAxes, 
-               fontsize=FONT_SIZES['annotation'],
-               verticalalignment='top', horizontalalignment='right',
-               bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray'))
-        
         # Add peak hours annotation if any
         if peak_hours:
             peak_text = f'Peak: {", ".join([f"{h:02d}h" for h in peak_hours[:3]])}'

@@ -116,13 +116,6 @@ def create_temporal_patterns_chart(ocorrencias):
     ax2.grid(axis='y', linestyle='--', alpha=0.3)
     ax2.set_axisbelow(True)
     
-    sig_text = f'χ² = {chi2:.2f}, p = {p_value:.4f}'
-    if p_value < ALPHA:
-        sig_text += ' *'
-    ax2.text(0.98, 0.02, sig_text, transform=ax2.transAxes, fontsize=FONT_SIZES['annotation'],
-            verticalalignment='bottom', horizontalalignment='right',
-            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray'))
-    
     add_subfigure_label(ax2, '(b)')
     add_sample_size_annotation(ax2, len(ocorrencias))
     
