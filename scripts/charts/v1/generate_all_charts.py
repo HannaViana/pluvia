@@ -52,7 +52,11 @@ def main():
         'chart_02_temporal_patterns.py',
         'chart_03_hourly_distribution.py',
         'chart_04_spatial_coverage.py',
-        'chart_05_hourly_by_season.py'
+        'chart_05_hourly_by_season.py',
+        'chart_06_duration_distribution.py',
+        'chart_07a_duration_by_type.py',
+        'chart_07b_duration_by_season.py',
+        'chart_08_duration_categories.py'
     ]
     
     results = {}
