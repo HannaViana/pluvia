@@ -69,13 +69,14 @@ def create_spatial_coverage_chart(ocorrencias_gdf):
     """Create spatial coverage analysis chart with histogram and CDF"""
     setup_plot_style()
     
-    distances_km = ocorrencias_gdf['distance_km'].values
+    # Filter out NaN values before calculating statistics
+    distances_km = ocorrencias_gdf['distance_km'].dropna().values
     
     # Calculate statistics
-    mean_dist = distances_km.mean()
-    median_dist = np.median(distances_km)
-    p90_dist = np.percentile(distances_km, 90)
-    max_dist = distances_km.max()
+    mean_dist = np.nanmean(distances_km)
+    median_dist = np.nanmedian(distances_km)
+    p90_dist = np.nanpercentile(distances_km, 90)
+    max_dist = np.nanmax(distances_km)
     
     # Create figure with 2 subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=FIGURE_SIZES['double'])

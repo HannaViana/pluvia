@@ -60,7 +60,7 @@ def create_event_type_chart(ocorrencias):
     
     # Extend x-axis to accommodate text labels
     max_count = event_counts.values.max()
-    ax.set_xlim(0, max_count * 1.15)  # Add 15% padding for text labels
+    ax.set_xlim(0, max_count * 1.21)  # Add 15% padding for text labels
     
     # Styling
     ax.set_yticks(range(len(event_counts)))
