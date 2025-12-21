@@ -1,0 +1,268 @@
+# Improved Charts for Scientific Publication - Version 1
+
+## Overview
+
+This directory contains improved chart generation scripts designed for scientific publication. The charts address critical weaknesses identified in the original visualization set and follow best practices for academic publications.
+
+## Key Improvements
+
+### 1. **Consolidated Chart Set**
+- **Reduced from 8 to 4 charts** by eliminating redundancy
+- Each chart provides unique, complementary insights
+- Better narrative flow and logical progression
+
+### 2. **Enhanced Statistical Rigor**
+- **Confidence intervals** (95% CI) for temporal patterns
+- **Chi-square tests** for distribution uniformity
+- **Sample sizes** clearly displayed on all charts
+- **Significance markers** (p-values) included where appropriate
+
+### 3. **Improved Visual Design**
+- **Unified color palette** (colorblind-friendly from ColorBrewer)
+- **Consistent typography** and font sizes across all charts
+- **Standardized dimensions** for publication compatibility
+- **Subfigure labels** (a, b, c) for multi-panel figures
+- **Professional styling** using seaborn-paper theme
+
+### 4. **Better Chart Types**
+- **Replaced pie charts with bar charts** for accurate categorical comparison
+- **Added cumulative distribution function (CDF)** for spatial coverage analysis
+- **Multi-panel figures** to show complementary views efficiently
+
+### 5. **Publication-Ready Features**
+- **Comprehensive titles** including location and time period
+- **Clear axis labels** with units
+- **Grid lines** for easier reading
+- **Annotations** for key statistics and findings
+- **High resolution** (300 DPI) output
+
+## Chart Descriptions
+
+### Chart 1: Event Type Distribution
+**File:** [`chart_01_event_types.py`](chart_01_event_types.py)  
+**Output:** `results/charts/v1/chart_01_event_types.png`
+
+**Improvements over original:**
+- Horizontal bar chart instead of pie chart (more accurate comparison)
+- Includes both counts and percentages
+- Sample size annotation
+- Clear value labels
+
+**Key findings:**
+- N = 4,868 flood events
+- "Bolsão d'água em via" dominates (86.6%)
+- Clear hierarchy of event types
+
+---
+
+### Chart 2: Temporal Patterns
+**File:** [`chart_02_temporal_patterns.py`](chart_02_temporal_patterns.py)  
+**Output:** `results/charts/v1/chart_02_temporal_patterns.png`
+
+**Improvements over original:**
+- **Panel (a):** Monthly distribution with 95% confidence intervals
+- **Panel (b):** Seasonal distribution with chi-square test
+- Eliminates redundancy (combined 5 temporal charts into 1)
+- Statistical significance testing (χ² = 2003.09, p < 0.001)
+- Non-negative confidence bounds
+
+**Key findings:**
+- Strong seasonal pattern (Summer: 47.9%, Winter: 6.3%)
+- Peak months: February (108 events avg), March (87), January (74)
+- Statistically significant seasonal variation
+
+---
+
+### Chart 3: Hourly Distribution
+**File:** [`chart_03_hourly_distribution.py`](chart_03_hourly_distribution.py)  
+**Output:** `results/charts/v1/chart_03_hourly_distribution.png`
+
+**Improvements over original:**
+- Mean and threshold lines (mean + 1σ)
+- Peak hours highlighted in red
+- Chi-square test for uniformity
+- Statistical annotations
+
+**Key findings:**
+- Strong diurnal pattern (χ² = 902.34, p < 0.001)
+- Peak hours: 17:00-21:00 (evening rush hour)
+- Minimum: 03:00-08:00 (early morning)
+- Potential reporting bias during business hours
+
+---
+
+### Chart 4: Spatial Coverage Analysis
+**File:** [`chart_04_spatial_coverage.py`](chart_04_spatial_coverage.py)  
+**Output:** `results/charts/v1/chart_04_spatial_coverage.png`
+
+**Improvements over original:**
+- **Panel (a):** Histogram with mean, median, and 90th percentile
+- **Panel (b):** Cumulative distribution function (CDF)
+- Coverage statistics clearly annotated
+- Addresses spatial bias implications
+
+**Key findings:**
+- 50% of events within median distance to nearest station
+- 90% coverage distance clearly marked
+- Important for understanding data quality and spatial representativeness
+
+---
+
+### Chart 5: Hourly Distribution by Season
+**File:** [`chart_05_hourly_by_season.py`](chart_05_hourly_by_season.py)
+**Output:** `results/charts/v1/chart_05_hourly_by_season.png`
+
+**New addition:**
+- **Four-panel figure** (2x2 grid) showing hourly patterns for each season
+- Each panel includes mean, threshold lines, and peak hour identification
+- Chi-square tests for each season
+- Season-specific color coding with peak hours highlighted
+
+**Key findings:**
+- **Summer (N=2,330):** Strong evening peak (17:00-20:00), 243 events at 19:00
+- **Autumn (N=1,534):** Evening peak shifts later (19:00-22:00), 113 events at 20:00
+- **Winter (N=307):** Weaker pattern, morning peak (06:00-07:00), 26 events at 16:00
+- **Spring (N=697):** Mixed pattern with peaks at 10:00, 17:00, and 22:00
+- All seasons show significant non-uniform distributions (p < 0.001)
+
+---
+
+## File Structure
+
+```
+scripts/charts/v1/
+├── README.md                          # This file
+├── config.py                          # Unified configuration module
+├── chart_01_event_types.py           # Event type distribution
+├── chart_02_temporal_patterns.py     # Monthly & seasonal patterns
+├── chart_03_hourly_distribution.py   # Hourly distribution (overall)
+├── chart_04_spatial_coverage.py      # Distance to stations
+├── chart_05_hourly_by_season.py      # Hourly distribution by season
+├── generate_all_charts.py            # Master script
+└── requirements.txt                   # Python dependencies
+
+results/charts/v1/
+├── chart_01_event_types.png
+├── chart_02_temporal_patterns.png
+├── chart_03_hourly_distribution.png
+├── chart_04_spatial_coverage.png
+└── chart_05_hourly_by_season.png
+```
+
+## Usage
+
+### Generate All Charts
+
+```bash
+# From project root
+./venv/bin/python scripts/charts/v1/generate_all_charts.py
+```
+
+### Generate Individual Charts
+
+```bash
+# From project root
+./venv/bin/python scripts/charts/v1/chart_01_event_types.py
+./venv/bin/python scripts/charts/v1/chart_02_temporal_patterns.py
+./venv/bin/python scripts/charts/v1/chart_03_hourly_distribution.py
+./venv/bin/python scripts/charts/v1/chart_04_spatial_coverage.py
+./venv/bin/python scripts/charts/v1/chart_05_hourly_by_season.py
+```
+
+## Dependencies
+
+```
+pandas
+matplotlib
+seaborn
+numpy
+scipy
+geopandas
+```
+
+Install with:
+```bash
+./venv/bin/pip install -r scripts/charts/v1/requirements.txt
+```
+
+## Configuration
+
+All visual styling is centralized in [`config.py`](config.py):
+
+- **Colors:** Colorblind-friendly palette from ColorBrewer
+- **Typography:** Consistent font sizes and weights
+- **Dimensions:** Standardized figure sizes
+- **Paths:** Data and output directories
+- **Constants:** Study period, location, significance level
+
+To modify styling across all charts, edit [`config.py`](config.py).
+
+## Comparison with Original Charts
+
+| Original | Issues | Improved Version |
+|----------|--------|------------------|
+| Chart 1 (Pie) | Pie chart, no context | Chart 1: Bar chart with percentages |
+| Chart 2-5 (Temporal) | Redundant, no statistics | Chart 2: Combined with CI & χ² test |
+| Chart 6 (Hourly) | No error bars, no significance | Chart 3: With statistics & peak hours |
+| Chart 7 (Monthly) | Duplicate of Chart 3 | **Removed** (redundant) |
+| Chart 8 (Distance) | Histogram only, no CDF | Chart 4: Histogram + CDF with coverage |
+| - | Missing seasonal hourly analysis | Chart 5: Hourly by season (NEW) |
+
+**Result:** 8 charts → 5 charts with more information, better design, and new insights
+
+## Scientific Publication Checklist
+
+- [x] High resolution (300 DPI)
+- [x] Colorblind-friendly palette
+- [x] Consistent typography
+- [x] Sample sizes displayed
+- [x] Statistical tests included
+- [x] Confidence intervals shown
+- [x] Subfigure labels (a, b, c)
+- [x] Comprehensive titles with context
+- [x] Clear axis labels with units
+- [x] Professional styling
+- [x] No redundant information
+- [x] Logical narrative flow
+
+## Notes for Publication
+
+1. **Figure Captions:** Add detailed captions in your manuscript explaining each panel and key findings
+
+2. **Statistical Reporting:** Include the following in your methods section:
+   - Chi-square tests for distribution uniformity
+   - 95% confidence intervals for temporal averages
+   - Distance calculations using SIRGAS 2000 / UTM zone 23S projection
+
+3. **Limitations:** Discuss potential reporting bias in hourly distribution (business hours effect)
+
+4. **Spatial Coverage:** Address implications of distance to rain gauge stations for data quality
+
+5. **Color Accessibility:** All charts use colorblind-friendly palettes suitable for grayscale printing
+
+## Future Improvements
+
+Potential enhancements for version 2:
+- Add trend analysis with Mann-Kendall test
+- Include inter-annual variability analysis
+- Add spatial autocorrelation analysis
+- Create combined figure for manuscript (all 4 charts in one)
+- Add event duration analysis
+- Include neighborhood-level analysis
+
+## Citation
+
+When using these charts in publications, ensure proper attribution of:
+- Data sources (COR, AlertaRio)
+- Analysis methods
+- Software used (Python, matplotlib, seaborn, geopandas)
+
+## Contact
+
+For questions or suggestions about these visualizations, please refer to the main project README.
+
+---
+
+**Version:** 1.0  
+**Date:** 2025-12-20  
+**Status:** Production-ready for scientific publication

@@ -51,7 +51,8 @@ def main():
         'chart_01_event_types.py',
         'chart_02_temporal_patterns.py',
         'chart_03_hourly_distribution.py',
-        'chart_04_spatial_coverage.py'
+        'chart_04_spatial_coverage.py',
+        'chart_05_hourly_by_season.py'
     ]
     
     results = {}
