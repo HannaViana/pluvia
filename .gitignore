@@ -10,3 +10,6 @@
 # Environment variables and secrets
 .env
 *.env
+
+# Virtual environment
+venv/
