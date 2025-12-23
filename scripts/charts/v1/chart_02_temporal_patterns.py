@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from config import (setup_plot_style, COLORS, FONT_SIZES, FIGURE_SIZES,
                     DATA_PATHS, OUTPUT_DIR, FLOOD_TYPES, EVENT_TYPE_MAPPING,
-                    STUDY_PERIOD, STUDY_LOCATION, add_sample_size_annotation,
+                    GENERIC_TYPE_MAPPING, STUDY_PERIOD, STUDY_LOCATION, add_sample_size_annotation,
                     add_subfigure_label, ALPHA)
 
 def load_and_prepare_data():
@@ -29,6 +29,7 @@ def load_and_prepare_data():
     
     ocorrencias = ocorrencias[ocorrencias['tipo'].isin(FLOOD_TYPES)]
     ocorrencias['tipo'] = ocorrencias['tipo'].replace(EVENT_TYPE_MAPPING)
+    ocorrencias['tipo'] = ocorrencias['tipo'].replace(GENERIC_TYPE_MAPPING)
     
     return ocorrencias
 

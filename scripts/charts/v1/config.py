@@ -76,6 +76,13 @@ EVENT_TYPE_MAPPING = {
     'Enchente': 'Alagamento'
 }
 
+# Generic category mapping for display (order: lamina, bolsão, alagamento)
+GENERIC_TYPE_MAPPING = {
+    "Lâmina d'água": 'Flood Type I',
+    "Bolsão d'água em via": 'Flood Type II',
+    'Alagamento': 'Flood Type III'
+}
+
 # CRS definitions
 CRS_GEOGRAPHIC = "EPSG:4326"  # WGS84
 CRS_PROJECTED = "EPSG:31983"  # SIRGAS 2000 / UTM zone 23S

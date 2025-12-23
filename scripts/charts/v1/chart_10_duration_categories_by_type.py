@@ -1,8 +1,8 @@
 """
 Chart 10: Event Duration Categories by Type
 Based on Chart 8 - generates two charts:
-1. Combined chart for "Lâmina d'água" and "Bolsão d'água em via"
-2. Single chart for "Alagamento"
+1. Combined chart for Flood Type I and Flood Type II
+2. Single chart for Flood Type III
 Each chart shows distribution of events by duration categories
 """
 
@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from config import (setup_plot_style, COLORS, FONT_SIZES, FIGURE_SIZES,
                     DATA_PATHS, OUTPUT_DIR, FLOOD_TYPES, EVENT_TYPE_MAPPING,
-                    STUDY_PERIOD, STUDY_LOCATION, add_sample_size_annotation)
+                    GENERIC_TYPE_MAPPING, STUDY_PERIOD, STUDY_LOCATION, add_sample_size_annotation)
 
 def load_and_prepare_data():
     """Load and preprocess flood event data with duration calculation"""
@@ -28,6 +28,7 @@ def load_and_prepare_data():
     
     ocorrencias = ocorrencias[ocorrencias['tipo'].isin(FLOOD_TYPES)]
     ocorrencias['tipo'] = ocorrencias['tipo'].replace(EVENT_TYPE_MAPPING)
+    ocorrencias['tipo'] = ocorrencias['tipo'].replace(GENERIC_TYPE_MAPPING)
     
     # Calculate duration in hours
     ocorrencias['duration_hours'] = (ocorrencias['data_fim'] - ocorrencias['data_inicio']).dt.total_seconds() / 3600
@@ -137,16 +138,16 @@ def main():
     
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Define chart groups
+    # Define chart groups (using generic names)
     chart_groups = [
         {
-            'types': ["Bolsão d'água em via", "Lâmina d'água"],
-            'title': '"Bolsão d\'água em via" and "Lâmina d\'água" Events',
+            'types': ['Flood Type I', 'Flood Type II'],
+            'title': 'Flood Type I and Flood Type II Events',
             'filename': 'bolsao_and_lamina'
         },
         {
-            'types': ['Alagamento'],
-            'title': '"Alagamento" Events',
+            'types': ['Flood Type III'],
+            'title': 'Flood Type III Events',
             'filename': 'alagamento'
         }
     ]
