@@ -42,8 +42,8 @@ def create_event_type_chart(ocorrencias):
     """Create bar chart of event type distribution"""
     setup_plot_style()
     
-    # Define order for flood types
-    flood_type_order = ['Flood Type I', 'Flood Type II', 'Flood Type III']
+    # Define order for flood types (reversed for horizontal bar chart - first item at top)
+    flood_type_order = ['Flood Type III', 'Flood Type II', 'Flood Type I']
     
     # Calculate event type counts and sort by predefined order
     event_counts = ocorrencias['tipo'].value_counts()
