@@ -42,8 +42,13 @@ def create_event_type_chart(ocorrencias):
     """Create bar chart of event type distribution"""
     setup_plot_style()
     
-    # Calculate event type counts
-    event_counts = ocorrencias['tipo'].value_counts().sort_values(ascending=True)
+    # Define order for flood types
+    flood_type_order = ['Flood Type I', 'Flood Type II', 'Flood Type III']
+    
+    # Calculate event type counts and sort by predefined order
+    event_counts = ocorrencias['tipo'].value_counts()
+    # Reindex to ensure correct order, only including types that exist
+    event_counts = event_counts.reindex([t for t in flood_type_order if t in event_counts.index])
     total_events = len(ocorrencias)
     percentages = (event_counts / total_events * 100)
     

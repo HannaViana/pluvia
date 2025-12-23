@@ -70,8 +70,11 @@ def create_duration_by_type_chart(ocorrencias):
     
     # Panel A: Box plot by event type (< 12 hours)
     ax1 = axes[0]
-    event_types = ocorrencias_filtered['tipo'].value_counts().index.tolist()
-    event_types = [event_types[1], event_types[0], event_types[2]] + event_types[3:]
+    # Define order for flood types
+    flood_type_order = ['Flood Type I', 'Flood Type II', 'Flood Type III']
+    # Get available event types in the correct order
+    available_types = [t for t in flood_type_order if t in ocorrencias_filtered['tipo'].values]
+    event_types = available_types
     data_by_type = [ocorrencias_filtered[ocorrencias_filtered['tipo'] == t]['duration_hours'].dropna() 
                     for t in event_types]
     
@@ -114,8 +117,11 @@ def create_duration_by_type_chart(ocorrencias):
     
     # Panel B: Mean duration by event type with error bars (all data)
     ax2 = axes[1]
+    # Define order for flood types
+    flood_type_order = ['Flood Type I', 'Flood Type II', 'Flood Type III']
     type_stats = ocorrencias.groupby('tipo')['duration_hours'].agg(['mean', 'std', 'count', 'sem'])
-    type_stats = type_stats.sort_values('mean', ascending=False)
+    # Reindex to ensure correct order, only including types that exist
+    type_stats = type_stats.reindex([t for t in flood_type_order if t in type_stats.index])
     
     bars = ax2.barh(range(len(type_stats)), type_stats['mean'],
                     xerr=type_stats['sem'], capsize=5,
