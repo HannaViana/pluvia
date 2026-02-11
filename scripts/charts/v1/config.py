@@ -55,7 +55,8 @@ FIGURE_SIZES = {
 DATA_PATHS = {
     'ocorrencias': 'nbs/exploration/ocorrencias/ocorrencias_filtradas.csv',
     'pops': 'data/raw/adm_cor_comando/pops.csv',
-    'stations': '~/work/data/meteorologia/clean/clima_pluviometro/estacoes_alertario.csv'
+    'stations': '~/work/data/meteorologia/clean/clima_pluviometro/estacoes_alertario.csv',
+    'id_analysis': 'data/processed/id_analysis'
 }
 
 # Output paths
