@@ -59,7 +59,8 @@ def main():
         'chart_08_duration_categories.py',
         'chart_09_duration_distribution_by_type.py',
         'chart_10_duration_categories_by_type.py',
-        'chart_11_id_by_station.py'
+        'chart_11_id_by_station.py',
+        'chart_12_id_thresholds.py'
     ]
     
     results = {}
