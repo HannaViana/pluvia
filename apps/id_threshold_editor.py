@@ -3,18 +3,20 @@
 Manual I-D Threshold Editor
 
 Streamlit app to manually draw intensity-duration threshold lines per station.
-Two control points define the power-law curve I = a * D^(-b) in log-log space.
+Streamlit sliders control the line position; the chart renders as a static
+Plotly HTML embed (fast, no Python figure object overhead).
 
 Run from project root:
     streamlit run apps/id_threshold_editor.py
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
 import subprocess
 import os
+import json
 
 # ---------------------------------------------------------------------------
 # Paths (relative to project root)
@@ -25,21 +27,12 @@ MANUAL_THRESHOLDS_PATH = f'{ID_ANALYSIS_DIR}/manual_thresholds.csv'
 METRICS_SCRIPT = 'scripts/processing/compute_threshold_metrics.py'
 
 # ---------------------------------------------------------------------------
-# Colors (matching chart_12 style)
-# ---------------------------------------------------------------------------
-COLOR_ESA = '#4393c3'
-COLOR_EA = '#d6604d'
-COLOR_THRESHOLD = '#252525'
-COLOR_CONTROL = '#f4a261'
-
-# ---------------------------------------------------------------------------
 # Data loading (cached)
 # ---------------------------------------------------------------------------
 
 @st.cache_data
 def load_pontos():
-    df = pd.read_csv(PONTOS_ID_PATH)
-    return df
+    return pd.read_csv(PONTOS_ID_PATH)
 
 
 def load_manual_thresholds():
@@ -60,88 +53,85 @@ def save_threshold(station_id, a, b):
     df.to_csv(MANUAL_THRESHOLDS_PATH, index=False, float_format='%.6f')
 
 
-# ---------------------------------------------------------------------------
-# Math helpers
-# ---------------------------------------------------------------------------
-
 def points_to_ab(d1, i1, d2, i2):
-    """Derive power-law params from two (duration, intensity) control points."""
     if d1 == d2:
         return np.nan, np.nan
-    log_d1, log_d2 = np.log(d1), np.log(d2)
-    log_i1, log_i2 = np.log(i1), np.log(i2)
-    b = -(log_i2 - log_i1) / (log_d2 - log_d1)
+    b = -(np.log(i2) - np.log(i1)) / (np.log(d2) - np.log(d1))
     a = i1 * (d1 ** b)
     return a, b
 
 
-def ab_to_intensity(a, b, d_range):
-    """Compute threshold intensities for a range of durations."""
-    return a * (d_range ** (-b))
+def compute_metrics(station_data, a, b):
+    D = station_data['duracao_h'].values
+    I = station_data['intensidade_max_mm_h'].values
+    y_true = (station_data['classificacao'] == 'EA').astype(int).values
+    y_pred = (I >= a * (D ** (-b))).astype(int)
+
+    tp = int(((y_true == 1) & (y_pred == 1)).sum())
+    fp = int(((y_true == 0) & (y_pred == 1)).sum())
+    fn = int(((y_true == 1) & (y_pred == 0)).sum())
+    tn = int(((y_true == 0) & (y_pred == 0)).sum())
+
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+
+    return dict(precision=precision, recall=recall, f1=f1,
+                tp=tp, fp=fp, fn=fn, tn=tn)
 
 
 # ---------------------------------------------------------------------------
-# Plot builder
+# Chart builder (static HTML string — very fast)
 # ---------------------------------------------------------------------------
 
-def build_plot(station_data, d1, i1, d2, i2, a, b):
+@st.cache_data
+def get_station_chart_data(station_id, _pontos_df):
+    """Pre-compute and cache the static scatter data for a station."""
+    station_data = _pontos_df[_pontos_df['id_estacao'] == station_id]
     esa = station_data[station_data['classificacao'] == 'ESA']
     ea = station_data[station_data['classificacao'] == 'EA']
-
-    fig = go.Figure()
-
-    # ESA points
-    fig.add_trace(go.Scatter(
-        x=esa['duracao_h'], y=esa['intensidade_max_mm_h'],
-        mode='markers',
-        name='No Flooding (ESA)',
-        marker=dict(color=COLOR_ESA, size=6, opacity=0.6),
-    ))
-
-    # EA points
-    fig.add_trace(go.Scatter(
-        x=ea['duracao_h'], y=ea['intensidade_max_mm_h'],
-        mode='markers',
-        name='With Flooding (EA)',
-        marker=dict(color=COLOR_EA, size=10, opacity=0.9,
-                    line=dict(color='black', width=0.5)),
-    ))
-
-    # Threshold line
-    if not (np.isnan(a) or np.isnan(b)):
-        d_min = station_data['duracao_h'].min()
-        d_max = station_data['duracao_h'].max()
-        d_range = np.logspace(np.log10(d_min), np.log10(d_max), 200)
-        i_range = ab_to_intensity(a, b, d_range)
-
-        fig.add_trace(go.Scatter(
-            x=d_range, y=i_range,
-            mode='lines',
-            name=f'Threshold: I = {a:.3f} × D^(-{b:.3f})',
-            line=dict(color=COLOR_THRESHOLD, width=2.5),
-        ))
-
-        # Control points on the line
-        fig.add_trace(go.Scatter(
-            x=[d1, d2], y=[i1, i2],
-            mode='markers',
-            name='Control Points',
-            marker=dict(color=COLOR_CONTROL, size=14, symbol='diamond',
-                        line=dict(color='black', width=1.5)),
-        ))
-
-    fig.update_layout(
-        xaxis=dict(type='log', title='Duration (h)', showgrid=True, gridcolor='#eee'),
-        yaxis=dict(type='log', title='Max Intensity (mm/h)', showgrid=True, gridcolor='#eee'),
-        legend=dict(x=0.01, y=0.99, bgcolor='rgba(255,255,255,0.85)',
-                    bordercolor='gray', borderwidth=1),
-        margin=dict(l=60, r=20, t=40, b=60),
-        height=500,
-        plot_bgcolor='white',
-        paper_bgcolor='white',
+    return (
+        esa['duracao_h'].tolist(), esa['intensidade_max_mm_h'].tolist(),
+        ea['duracao_h'].tolist(), ea['intensidade_max_mm_h'].tolist(),
     )
 
-    return fig
+
+def build_chart_html(esa_d, esa_i, ea_d, ea_i, line_d, line_i,
+                     x_min, x_max):
+    """Build minimal Plotly HTML with pre-computed data."""
+    html = f"""
+<!DOCTYPE html>
+<html><head>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>* {{ margin:0; padding:0; }} body {{ background:white; }}</style>
+</head><body>
+<div id="c" style="width:100%;height:500px;"></div>
+<script>
+Plotly.newPlot('c', [
+  {{ x:{json.dumps(esa_d)}, y:{json.dumps(esa_i)}, mode:'markers',
+     name:'No Flooding (ESA)',
+     marker:{{ color:'#4393c3', size:5, opacity:0.5 }} }},
+  {{ x:{json.dumps(ea_d)}, y:{json.dumps(ea_i)}, mode:'markers',
+     name:'With Flooding (EA)',
+     marker:{{ color:'#d6604d', size:8, opacity:0.9,
+              line:{{ color:'black', width:0.5 }} }} }},
+  {{ x:{json.dumps(line_d)}, y:{json.dumps(line_i)}, mode:'lines',
+     name:'Threshold',
+     line:{{ color:'#252525', width:2, dash:'dash' }} }}
+], {{
+  xaxis:{{ type:'log', title:'Duration (h)',
+           range:[{np.log10(x_min)},{np.log10(x_max)}],
+           showgrid:true, gridcolor:'#e8e8e8' }},
+  yaxis:{{ type:'log', title:'Max Intensity (mm/h)',
+           showgrid:true, gridcolor:'#e8e8e8' }},
+  legend:{{ x:0.01, y:0.99, bgcolor:'rgba(255,255,255,0.85)',
+            bordercolor:'gray', borderwidth:1 }},
+  margin:{{ l:65, r:20, t:20, b:55 }},
+  plot_bgcolor:'white', paper_bgcolor:'white', hovermode:'closest'
+}}, {{ responsive:true }});
+</script></body></html>
+"""
+    return html
 
 
 # ---------------------------------------------------------------------------
@@ -154,113 +144,111 @@ def main():
 
     pontos_df = load_pontos()
     manual_df = load_manual_thresholds()
-
     station_ids = sorted(pontos_df['id_estacao'].unique())
 
-    # ---- Sidebar ----
+    # ---- Sidebar: Station ----
     st.sidebar.header('Station')
     station_id = st.sidebar.selectbox('Select station', station_ids)
 
-    station_data = pontos_df[pontos_df['id_estacao'] == station_id].copy()
-
+    station_data = pontos_df[pontos_df['id_estacao'] == station_id]
     d_values = sorted(station_data['duracao_h'].unique())
     i_min = float(station_data['intensidade_max_mm_h'].min())
     i_max = float(station_data['intensidade_max_mm_h'].max())
     d_min = float(min(d_values))
     d_max = float(max(d_values))
 
-    # Load saved threshold for this station if available
+    log_i_min = float(np.log10(i_min))
+    log_i_max = float(np.log10(i_max))
+
+    # Load saved threshold
     saved = manual_df[manual_df['id_estacao'] == station_id]
-    if not saved.empty and not np.isnan(saved.iloc[0]['a']):
+    has_saved = not saved.empty and not np.isnan(saved.iloc[0]['a'])
+
+    if has_saved:
         saved_a = float(saved.iloc[0]['a'])
         saved_b = float(saved.iloc[0]['b'])
-        # Derive default control point intensities from saved a, b
-        default_i1 = float(saved_a * (d_min ** (-saved_b)))
-        default_i2 = float(saved_a * (d_max ** (-saved_b)))
-        default_i1 = np.clip(default_i1, i_min, i_max)
-        default_i2 = np.clip(default_i2, i_min, i_max)
+        def_i1 = float(np.clip(saved_a * (d_min ** (-saved_b)), i_min, i_max))
+        def_i2 = float(np.clip(saved_a * (d_max ** (-saved_b)), i_min, i_max))
+        def_log_i1 = float(np.log10(def_i1))
+        def_log_i2 = float(np.log10(def_i2))
+        st.sidebar.info(f'Saved: a={saved_a:.4f}, b={saved_b:.4f}')
     else:
         i_median = float(station_data['intensidade_max_mm_h'].median())
-        default_i1 = i_median
-        default_i2 = i_median * 0.5
+        def_log_i1 = float(np.log10(i_median))
+        def_log_i2 = float(np.log10(max(i_median * 0.5, i_min)))
 
+    # ---- Sidebar: Sliders ----
     st.sidebar.markdown('---')
-    st.sidebar.header('Control Point 1')
-    st.sidebar.caption(f'Duration fixed at D₁ = {d_min:.2f} h (min)')
+    st.sidebar.header('Threshold Line')
+
     log_i1 = st.sidebar.slider(
-        'log(I₁)',
-        min_value=float(np.log10(i_min)),
-        max_value=float(np.log10(i_max)),
-        value=float(np.log10(default_i1)),
-        step=0.01,
-        key='log_i1',
-        format='%.2f',
+        f'Intensity at D={d_min:.2f}h (log₁₀)',
+        min_value=log_i_min, max_value=log_i_max,
+        value=def_log_i1, step=0.005, format='%.3f',
     )
-    i1 = 10 ** log_i1
+    st.sidebar.caption(f'I₁ = {10**log_i1:.2f} mm/h')
 
-    st.sidebar.markdown('---')
-    st.sidebar.header('Control Point 2')
-    st.sidebar.caption(f'Duration fixed at D₂ = {d_max:.2f} h (max)')
     log_i2 = st.sidebar.slider(
-        'log(I₂)',
-        min_value=float(np.log10(i_min)),
-        max_value=float(np.log10(i_max)),
-        value=float(np.log10(default_i2)),
-        step=0.01,
-        key='log_i2',
-        format='%.2f',
+        f'Intensity at D={d_max:.2f}h (log₁₀)',
+        min_value=log_i_min, max_value=log_i_max,
+        value=def_log_i2, step=0.005, format='%.3f',
     )
-    i2 = 10 ** log_i2
+    st.sidebar.caption(f'I₂ = {10**log_i2:.2f} mm/h')
 
-    # Derive a, b
+    i1 = 10 ** log_i1
+    i2 = 10 ** log_i2
     a, b = points_to_ab(d_min, i1, d_max, i2)
 
-    # ---- Main area ----
-    col1, col2 = st.columns([3, 1])
+    # ---- Chart ----
+    esa_d, esa_i, ea_d, ea_i = get_station_chart_data(station_id, pontos_df)
 
-    with col1:
-        fig = build_plot(station_data, d_min, i1, d_max, i2, a, b)
-        st.plotly_chart(fig, use_container_width=True)
+    x_pad = 0.15
+    x_min = 10 ** (np.log10(d_min) - x_pad)
+    x_max = 10 ** (np.log10(d_max) + x_pad)
 
-    with col2:
-        st.markdown('### Parameters')
-        if not np.isnan(a) and not np.isnan(b):
-            st.metric('a', f'{a:.4f}')
-            st.metric('b', f'{b:.4f}')
-            st.latex(r'I = {:.3f} \times D^{{-{:.3f}}}'.format(a, b))
+    line_d = np.logspace(np.log10(x_min), np.log10(x_max), 150).tolist()
+    line_i = [a * (d ** (-b)) for d in line_d] if not np.isnan(a) else [0] * 150
+
+    html = build_chart_html(esa_d, esa_i, ea_d, ea_i, line_d, line_i,
+                            x_min, x_max)
+    components.html(html, height=520, scrolling=False)
+
+    # ---- Metrics ----
+    if not np.isnan(a):
+        m = compute_metrics(station_data, a, b)
+        cols = st.columns(7)
+        for col, (label, val) in zip(cols, [
+            ('Recall', f'{m["recall"]:.2f}'),
+            ('Precision', f'{m["precision"]:.2f}'),
+            ('F1', f'{m["f1"]:.2f}'),
+            ('TP', m['tp']), ('FP', m['fp']),
+            ('FN', m['fn']), ('TN', m['tn']),
+        ]):
+            col.metric(label, val)
+
+        st.markdown(f'**I = {a:.3f} × D⁻{b:.3f}** &emsp; a={a:.6f} &emsp; b={b:.6f}')
+
+    # ---- Sidebar: Save ----
+    st.sidebar.markdown('---')
+    if st.sidebar.button('Save Threshold', disabled=np.isnan(a)):
+        save_threshold(station_id, a, b)
+        st.sidebar.success(f'Saved: a={a:.4f}, b={b:.4f}')
+        st.rerun()
+
+    # ---- Sidebar: Export ----
+    st.sidebar.markdown('---')
+    if st.sidebar.button('Compute Metrics & Export'):
+        with st.spinner('Running metrics script...'):
+            result = subprocess.run(
+                ['python', METRICS_SCRIPT],
+                capture_output=True, text=True, cwd=os.getcwd()
+            )
+        if result.returncode == 0:
+            st.sidebar.success('threshold_parameters.csv updated!')
         else:
-            st.warning('Cannot compute line (D1 == D2)')
-
-        n_ea = int((station_data['classificacao'] == 'EA').sum())
-        n_esa = int((station_data['classificacao'] == 'ESA').sum())
-        st.markdown('### Data')
-        st.write(f'EA points: **{n_ea}**')
-        st.write(f'ESA points: **{n_esa}**')
-
-        # Check if already saved
-        already_saved = not saved.empty and not np.isnan(saved.iloc[0]['a'])
-        if already_saved:
-            st.success('Threshold saved ✓')
-
-        st.markdown('---')
-        if st.button('💾 Save Threshold', disabled=np.isnan(a)):
-            save_threshold(station_id, a, b)
-            st.success(f'Saved: a={a:.4f}, b={b:.4f}')
-            st.cache_data.clear()
-
-        st.markdown('---')
-        if st.button('⚙️ Compute Metrics & Export'):
-            with st.spinner('Running metrics script...'):
-                result = subprocess.run(
-                    ['python', METRICS_SCRIPT],
-                    capture_output=True, text=True, cwd=os.getcwd()
-                )
-            if result.returncode == 0:
-                st.success('threshold_parameters.csv updated!')
-            else:
-                st.error('Script failed')
-            with st.expander('Script output'):
-                st.code(result.stdout + result.stderr)
+            st.sidebar.error('Script failed')
+        with st.sidebar.expander('Script output'):
+            st.code(result.stdout + result.stderr)
 
 
 if __name__ == '__main__':
