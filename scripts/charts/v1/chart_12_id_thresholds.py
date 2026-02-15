@@ -23,11 +23,11 @@ THRESHOLDS_PATH = f'{ID_ANALYSIS_DIR}/threshold_parameters.csv'
 # Duration windows used in analysis (in minutes)
 DURATIONS_MIN = [15, 30, 60, 120, 180, 720]
 
-# Chart colors and styling
+# Chart colors and styling (referencing project palette from config)
 COLORS_ID = {
-    'ESA': '#4393c3',  # Blue - no flooding
-    'EA': '#d6604d',   # Red - with flooding
-    'threshold': '#252525'  # Black for threshold line
+    'ESA': COLORS['diverging'][1],   # '#4393c3' - Blue, no flooding
+    'EA': COLORS['diverging'][-2],   # '#d6604d' - Red, with flooding
+    'threshold': '#252525'  # Black - high contrast threshold line
 }
 
 MARKER_SIZES = {
@@ -103,8 +103,8 @@ def create_threshold_chart_for_station(station_id, station_data, threshold_param
 
         ax.plot(D_range, I_threshold,
                color=COLORS_ID['threshold'],
-               linewidth=2.5,
-               linestyle='-',
+               linewidth=2,
+               linestyle='--',
                zorder=ZORDER['threshold'],
                label='Threshold Curve')
 
