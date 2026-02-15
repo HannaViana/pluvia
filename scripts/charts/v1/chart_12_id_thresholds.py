@@ -61,7 +61,7 @@ def load_data():
     return pontos_id_df, thresholds_df
 
 def create_threshold_chart_for_station(station_id, station_data, threshold_params):
-    """Create I-D scatter plot with fitted threshold curve for a single station"""
+    """Create I-D scatter plot with threshold zones for a single station"""
     setup_plot_style()
 
     fig, ax = plt.subplots(figsize=FIGURE_SIZES['single'])
@@ -70,57 +70,94 @@ def create_threshold_chart_for_station(station_id, station_data, threshold_param
     esa_data = station_data[station_data['classificacao'] == 'ESA']
     ea_data = station_data[station_data['classificacao'] == 'EA']
 
-    # Plot ESA (no flooding) first - background layer
-    if not esa_data.empty:
-        ax.scatter(esa_data['duracao_h'], esa_data['intensidade_max_mm_h'],
-                  color=COLORS_ID['ESA'],
-                  s=MARKER_SIZES['ESA'],
-                  alpha=MARKER_ALPHA['ESA'],
-                  zorder=ZORDER['ESA'],
-                  label='No Flooding (ESA)',
-                  edgecolor='none')
-
-    # Plot EA (with flooding) on top - foreground layer for emphasis
-    if not ea_data.empty:
-        ax.scatter(ea_data['duracao_h'], ea_data['intensidade_max_mm_h'],
-                  color=COLORS_ID['EA'],
-                  s=MARKER_SIZES['EA'],
-                  alpha=MARKER_ALPHA['EA'],
-                  zorder=ZORDER['EA'],
-                  label='With Flooding (EA)',
-                  edgecolor='black',
-                  linewidth=0.5)
-
-    # Plot threshold curve if parameters are valid
     a = threshold_params['a']
     b = threshold_params['b']
 
-    if not np.isnan(a) and not np.isnan(b):
-        # Generate smooth curve
-        D_range = np.logspace(np.log10(DURATIONS_MIN[0]/60),
-                             np.log10(DURATIONS_MIN[-1]/60), 100)
-        I_threshold = a * (D_range ** (-b))
+    # Axis limits with log-space padding so tick markers aren't clipped
+    d_min = DURATIONS_MIN[0] / 60
+    d_max = DURATIONS_MIN[-1] / 60
+    x_pad = 0.15  # padding in log units
+    x_min = 10 ** (np.log10(d_min) - x_pad)
+    x_max = 10 ** (np.log10(d_max) + x_pad)
 
-        ax.plot(D_range, I_threshold,
-               color=COLORS_ID['threshold'],
-               linewidth=2,
-               linestyle='--',
-               zorder=ZORDER['threshold'],
-               label='Threshold Curve')
+    all_intensities = station_data['intensidade_max_mm_h']
+    i_min = all_intensities.min() * 0.4
+    i_max = all_intensities.max() * 2.5
 
-    # Set log scales
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(i_min, i_max)
+
+    # Draw zones if threshold is valid
+    if not np.isnan(a) and not np.isnan(b):
+        D_range = np.logspace(np.log10(x_min), np.log10(x_max), 200)
+        I_threshold = a * (D_range ** (-b))
+
+        # Flood zone (above threshold) — light red fill
+        ax.fill_between(D_range, I_threshold, i_max,
+                        color=COLORS_ID['EA'], alpha=0.08, zorder=0)
+
+        # Safe zone (below threshold) — light blue fill
+        ax.fill_between(D_range, i_min, I_threshold,
+                        color=COLORS_ID['ESA'], alpha=0.08, zorder=0)
+
+        # Threshold line
+        ax.plot(D_range, I_threshold,
+                color=COLORS_ID['threshold'],
+                linewidth=2,
+                linestyle='--',
+                zorder=ZORDER['threshold'],
+                label=f'Threshold  $I = {a:.2f} \\cdot D^{{-{b:.2f}}}$')
+
+        # Zone labels — positioned in the interior of each zone
+        ax.text(0.97, 0.97, 'Flood Zone',
+                transform=ax.transAxes,
+                fontsize=FONT_SIZES['annotation'],
+                color=COLORS_ID['EA'],
+                fontweight='bold',
+                verticalalignment='top',
+                horizontalalignment='right',
+                alpha=0.85)
+
+        ax.text(0.97, 0.05, 'Non-triggering Zone',
+                transform=ax.transAxes,
+                fontsize=FONT_SIZES['annotation'],
+                color=COLORS_ID['ESA'],
+                fontweight='bold',
+                verticalalignment='bottom',
+                horizontalalignment='right',
+                alpha=0.85)
+
+    # Plot ESA (no flooding)
+    if not esa_data.empty:
+        ax.scatter(esa_data['duracao_h'], esa_data['intensidade_max_mm_h'],
+                   color=COLORS_ID['ESA'],
+                   s=MARKER_SIZES['ESA'],
+                   alpha=MARKER_ALPHA['ESA'],
+                   zorder=ZORDER['ESA'],
+                   label=f'No Flooding — ESA (n={len(esa_data)})',
+                   edgecolor='none')
+
+    # Plot EA (with flooding)
+    if not ea_data.empty:
+        ax.scatter(ea_data['duracao_h'], ea_data['intensidade_max_mm_h'],
+                   color=COLORS_ID['EA'],
+                   s=MARKER_SIZES['EA'],
+                   alpha=MARKER_ALPHA['EA'],
+                   zorder=ZORDER['EA'],
+                   label=f'With Flooding — EA (n={len(ea_data)})',
+                   edgecolor='black',
+                   linewidth=0.5)
 
     # Configure x-axis ticks with custom labels
-    x_tick_positions = [d/60 for d in DURATIONS_MIN]
+    x_tick_positions = [d / 60 for d in DURATIONS_MIN]
     x_tick_labels = []
     for d in DURATIONS_MIN:
         if d < 60:
             x_tick_labels.append(f'{d}min')
         else:
-            hours = d // 60
-            x_tick_labels.append(f'{hours}h')
+            x_tick_labels.append(f'{d // 60}h')
 
     ax.set_xticks(x_tick_positions)
     ax.set_xticklabels(x_tick_labels, fontsize=FONT_SIZES['tick_label'])
@@ -128,54 +165,32 @@ def create_threshold_chart_for_station(station_id, station_data, threshold_param
     # Labels and title
     ax.set_xlabel('Duration', fontsize=FONT_SIZES['axis_label'], fontweight='bold')
     ax.set_ylabel('Maximum Intensity (mm/h)', fontsize=FONT_SIZES['axis_label'], fontweight='bold')
-    ax.set_title(f'Intensity-Duration Threshold\nStation {station_id}',
-                fontsize=FONT_SIZES['title'], fontweight='bold', pad=15)
+    ax.set_title(f'Intensity–Duration Threshold — Station {station_id}\n'
+                 f'{STUDY_LOCATION}, {STUDY_PERIOD}',
+                 fontsize=FONT_SIZES['title'], fontweight='bold', pad=15)
 
     # Grid
-    ax.grid(True, which="both", linestyle='--', alpha=0.4, linewidth=0.5)
+    ax.grid(True, which='both', linestyle='--', alpha=0.3, linewidth=0.5)
     ax.set_axisbelow(True)
 
-    # Legend
-    legend = ax.legend(loc='upper right', fontsize=FONT_SIZES['legend'],
-                      frameon=True, fancybox=True, shadow=False)
+    # Legend (lower left to avoid overlap with zone label)
+    legend = ax.legend(loc='upper left', fontsize=FONT_SIZES['legend'],
+                       frameon=True, fancybox=True, shadow=False)
     legend.get_frame().set_alpha(0.9)
     legend.get_frame().set_edgecolor('gray')
     legend.get_frame().set_linewidth(0.5)
 
-    # Add threshold equation and metrics annotation
+    # Equation + recall annotation (bottom left, unobtrusive)
     if not np.isnan(a) and not np.isnan(b):
-        precision = threshold_params['precision']
         recall = threshold_params['recall']
         f1 = threshold_params['f1']
-
-        equation_text = f'I = {a:.3f} × D$^{{{-b:.3f}}}$'
-        metrics_text = f'P={precision:.2f}, R={recall:.2f}, F1={f1:.2f}'
-        annotation_text = f'{equation_text}\n{metrics_text}'
-    else:
-        annotation_text = 'No threshold\n(insufficient data)'
-
-    ax.text(0.02, 0.98, annotation_text,
-            transform=ax.transAxes,
-            fontsize=FONT_SIZES['annotation'],
-            verticalalignment='top',
-            horizontalalignment='left',
-            bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.9,
-                     edgecolor='gray', linewidth=0.5))
-
-    # Add confusion matrix annotation
-    tp = int(threshold_params['TP'])
-    fp = int(threshold_params['FP'])
-    fn = int(threshold_params['FN'])
-    tn = int(threshold_params['TN'])
-
-    confusion_text = f'TP={tp}, FP={fp}\nFN={fn}, TN={tn}'
-    ax.text(0.98, 0.02, confusion_text,
-            transform=ax.transAxes,
-            fontsize=FONT_SIZES['annotation'],
-            verticalalignment='bottom',
-            horizontalalignment='right',
-            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9,
-                     edgecolor='gray', linewidth=0.5))
+        annotation_text = f'Recall={recall:.2f}  F1={f1:.2f}'
+        ax.text(0.02, 0.02, annotation_text,
+                transform=ax.transAxes,
+                fontsize=FONT_SIZES['annotation'],
+                verticalalignment='bottom',
+                horizontalalignment='left',
+                color='#444444')
 
     plt.tight_layout()
 
