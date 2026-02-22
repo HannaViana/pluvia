@@ -30,6 +30,12 @@ MIN_RAIN_THRESHOLD_MM = 1       # Minimum rain (mm) to consider as rainy period
 DURATIONS_TO_ANALYZE_MIN = [15, 30, 60, 120, 180, 720]  # Duration windows in minutes
 MIN_FLOOD_RECORDS = 2           # Minimum flood records to classify event as EA
 
+# # Analysis Parameters (original -  do not change)
+# MIN_DRY_PERIOD_HOURS = 1        # Hours of no rain to separate events
+# MIN_RAIN_THRESHOLD_MM = 1       # Minimum rain (mm) to consider as rainy period
+# DURATIONS_TO_ANALYZE_MIN = [15, 30, 60, 120, 180, 720]  # Duration windows in minutes
+# MIN_FLOOD_RECORDS = 2           # Minimum flood records to classify event as EA
+
 # Flood event types to consider
 FLOOD_EVENT_TYPES = [
     "Bolsão d'água em via",
