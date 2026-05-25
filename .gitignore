@@ -13,3 +13,8 @@
 
 # Virtual environment
 venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo

@@ -1,0 +1,74 @@
+================================================================================
+API ANALYSIS PROCESSING PIPELINE
+================================================================================
+
+Output directory: /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis
+
+================================================================================
+STEP 1: Loading Input Data
+================================================================================
+
+Loading alertario data...
+  Loaded 10,406,927 records
+Loading stations data...
+  Loaded 37 stations
+Loading ocorrencias data...
+  Loaded 87,620 occurrences
+Loading POPs data...
+  Loaded 40 POP types
+Loading Thiessen polygons...
+  Loaded 33 polygons
+
+================================================================================
+STEP 2: Processing Precipitation Data
+================================================================================
+  Rain Date Range: 2015-04-09 15:00:00 -> 2024-03-27 10:45:00
+
+================================================================================
+STEP 3: Processing Flood Occurrences
+================================================================================
+  Filtered to 4,683 flood events
+  Alertario filtered: 2015-04-09 15:00:00 -> 2024-03-27 10:45:00
+  Associated 4,349 flood occurrences with stations
+
+================================================================================
+STEP 4: Computing Daily Peak Intensities
+================================================================================
+  Time-steps: [15, 30, 60, 120, 180, 360, 480, 600, 720, 1440] min
+Computing daily peaks: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████| 33/33 [03:23<00:00,  6.17s/it]
+  Total day-station records: 106,250
+  After filtering (>= 10.0 mm): 10,751 records
+
+================================================================================
+STEP 5: Computing API Values
+================================================================================
+  Decay rate k = 0.85
+  Max antecedent days = 10
+Computing API: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 33/33 [00:08<00:00,  3.86it/s]
+  Computed API for 10,751 day-station pairs
+
+================================================================================
+STEP 6: Classifying Events (EA vs ESA)
+================================================================================
+  Unique flood day-station pairs: 2,253
+  Total classified events: 10,751
+  EA (with flooding): 1,424
+  ESA (without flooding): 9,327
+
+================================================================================
+STEP 7: Saving Outputs
+================================================================================
+  Saved /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/daily_peak_intensities.csv (10,751 records)
+  Saved /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/daily_api_values.csv (10,751 records)
+  Saved /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/api_analysis_events.csv (10,751 records)
+
+================================================================================
+PROCESSING COMPLETE
+================================================================================
+
+  Stations processed: 33
+  Qualifying day-station pairs: 10,751
+  EA events: 1,424
+  ESA events: 9,327
+  Output directory: /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis
+================================================================================

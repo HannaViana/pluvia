@@ -1,0 +1,97 @@
+================================================================================
+API THRESHOLD FITTING
+================================================================================
+
+Loading events from /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/api_analysis_events.csv...
+  Loaded 10,751 events
+  EA: 1,424
+  ESA: 9,327
+
+Fitting thresholds for 10 time-steps...
+
+────────────────────────────────────────────────────────────
+  Time-step: 1/6 h (I_15min)
+    Raw thresholds: upper=2353.60, lower=2.40
+    Tolerance thresholds: upper=100.00, lower=6.40
+    Best API: 1 days (a=24.69, b=-0.0621, c=8.99)
+    Full system POD=51.19%, FAR=31.96%, PPV=19.66%
+
+────────────────────────────────────────────────────────────
+  Time-step: 1/2 h (I_30min)
+    Raw thresholds: upper=2226.00, lower=2.00
+    Tolerance thresholds: upper=81.20, lower=5.60
+    Best API: 1 days (a=20.01, b=-0.0621, c=5.57)
+    Full system POD=53.79%, FAR=33.55%, PPV=19.68%
+
+────────────────────────────────────────────────────────────
+  Time-step: 1 h (I_1h)
+    Raw thresholds: upper=1701.40, lower=1.60
+    Tolerance thresholds: upper=58.00, lower=4.20
+    Best API: 1 days (a=10.75, b=-0.1142, c=6.67)
+    Full system POD=52.60%, FAR=31.49%, PPV=20.33%
+
+────────────────────────────────────────────────────────────
+  Time-step: 2 h (I_2h)
+    Raw thresholds: upper=1311.50, lower=1.30
+    Tolerance thresholds: upper=35.95, lower=3.00
+    Best API: 8 days (a=6.88, b=-0.1663, c=7.20)
+    Full system POD=49.93%, FAR=28.74%, PPV=21.19%
+
+────────────────────────────────────────────────────────────
+  Time-step: 3 h (I_3h)
+    Raw thresholds: upper=895.60, lower=1.13
+    Tolerance thresholds: upper=26.35, lower=2.33
+    Best API: 10 days (a=1.82, b=-0.1142, c=6.25)
+    Full system POD=48.42%, FAR=27.17%, PPV=21.68%
+
+────────────────────────────────────────────────────────────
+  Time-step: 6 h (I_6h)
+    Raw thresholds: upper=447.80, lower=0.67
+    Tolerance thresholds: upper=15.62, lower=1.53
+    Best API: 10 days (a=1.07, b=-0.5832, c=3.54)
+    Full system POD=54.52%, FAR=30.88%, PPV=21.52%
+
+────────────────────────────────────────────────────────────
+  Time-step: 8 h (I_8h)
+    Raw thresholds: upper=335.85, lower=0.70
+    Tolerance thresholds: upper=12.49, lower=1.23
+    Best API: 8 days (a=0.12, b=-0.3226, c=2.68)
+    Full system POD=58.90%, FAR=33.95%, PPV=21.17%
+
+────────────────────────────────────────────────────────────
+  Time-step: 10 h (I_10h)
+    Raw thresholds: upper=268.68, lower=0.56
+    Tolerance thresholds: upper=10.23, lower=1.02
+    Best API: 10 days (a=1.96, b=-0.1142, c=2.07)
+    Full system POD=50.65%, FAR=28.14%, PPV=21.84%
+
+────────────────────────────────────────────────────────────
+  Time-step: 12 h (I_12h)
+    Raw thresholds: upper=223.90, lower=0.47
+    Tolerance thresholds: upper=8.78, lower=0.88
+    Best API: 8 days (a=1.70, b=-0.1142, c=1.75)
+    Full system POD=49.28%, FAR=27.24%, PPV=21.88%
+
+────────────────────────────────────────────────────────────
+  Time-step: 24 h (I_24h)
+    Raw thresholds: upper=111.95, lower=0.31
+    Tolerance thresholds: upper=5.06, lower=0.47
+    Best API: 10 days (a=0.71, b=-0.0621, c=0.92)
+    Full system POD=50.94%, FAR=28.68%, PPV=22.38%
+
+================================================================================
+SAVING RESULTS
+================================================================================
+  Saved /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/api_threshold_parameters.csv (10 time-steps)
+  Saved /home/luisresende/work/projects/rain-and-flood-analysis/data/processed/api_analysis/api_threshold_metrics.csv (100 rows)
+
+================================================================================
+SUMMARY
+================================================================================
+  Successfully fitted: 10/10 time-steps
+
+  Best overall: 8h x 8 days
+    I = 0.12 * exp(-0.3226 * API) + 2.68
+    POD=58.90%, FAR=33.95%, PPV=21.17%
+
+================================================================================

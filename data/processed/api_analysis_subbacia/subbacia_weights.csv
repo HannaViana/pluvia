@@ -1,0 +1,149 @@
+shi_cd,shi_nm,id_estacao,weight
+2,Ilha de Paquetá,18,1.000000
+5,Micro bacia da Praia Grande,18,1.000000
+6,Micro bacia do Saco do Pinhão,18,1.000000
+7,Micro bacia do Saco do Valente,18,1.000000
+8,Micro bacia do Canal dos Bancários,18,1.000000
+9,Micro bacia do Galeão,18,0.804523
+9,Micro bacia do Galeão,21,0.195477
+10,Micro bacia da Praia da Guanabara,18,1.000000
+11,Micro bacia do Canal da Portuguesa,18,1.000000
+12,Micro bacia de Cocotá/Pitangueiras/Zumbi/Ribeira,18,1.000000
+13,Micro bacia do Rio Jequiá,18,1.000000
+14,Micro bacia da Praia de São Bento,18,1.000000
+15,Micro bacia do Jardim Guanabara,18,1.000000
+17,Ilha do Fundão,24,0.502188
+17,Ilha do Fundão,18,0.297733
+17,Ilha do Fundão,21,0.200080
+18,Sub bacia Secundária do Rio da Prata do Mendanha,5,0.850382
+18,Sub bacia Secundária do Rio da Prata do Mendanha,7,0.081590
+18,Sub bacia Secundária do Rio da Prata do Mendanha,4,0.068028
+19,Sub bacia Secundária do Rio Campinho,4,0.841499
+19,Sub bacia Secundária do Rio Campinho,3,0.129335
+19,Sub bacia Secundária do Rio Campinho,5,0.029167
+20,Sub bacia Secundária do Rio Cação Vermelho,3,0.748088
+20,Sub bacia Secundária do Rio Cação Vermelho,1,0.225226
+20,Sub bacia Secundária do Rio Cação Vermelho,4,0.026686
+21,Sub bacia do Rio Piraquê/Cabuçu,4,0.613681
+21,Sub bacia do Rio Piraquê/Cabuçu,2,0.188029
+21,Sub bacia do Rio Piraquê/Cabuçu,7,0.099938
+21,Sub bacia do Rio Piraquê/Cabuçu,6,0.039542
+21,Sub bacia do Rio Piraquê/Cabuçu,3,0.023033
+21,Sub bacia do Rio Piraquê/Cabuçu,5,0.019522
+21,Sub bacia do Rio Piraquê/Cabuçu,1,0.016254
+22,Sub bacia do Rio do Ponto,1,0.875189
+22,Sub bacia do Rio do Ponto,3,0.124631
+22,Sub bacia do Rio do Ponto,2,0.000180
+23,Sub bacia do Rio Portinho,6,0.719711
+23,Sub bacia do Rio Portinho,2,0.212153
+23,Sub bacia do Rio Portinho,4,0.068136
+24,Sub bacia do Rio Piracão,2,0.716124
+24,Sub bacia do Rio Piracão,6,0.283876
+25,Restinga de Marambaia,2,1.000000
+26,Sub bacia do Arroio Fundo/Rio Grande,13,0.421257
+26,Sub bacia do Arroio Fundo/Rio Grande,7,0.258448
+26,Sub bacia do Arroio Fundo/Rio Grande,15,0.186155
+26,Sub bacia do Arroio Fundo/Rio Grande,14,0.068821
+26,Sub bacia do Arroio Fundo/Rio Grande,10,0.060029
+26,Sub bacia do Arroio Fundo/Rio Grande,8,0.003126
+26,Sub bacia do Arroio Fundo/Rio Grande,17,0.002165
+27,Sub bacia do Rio do Anil,14,0.674945
+27,Sub bacia do Rio do Anil,15,0.264203
+27,Sub bacia do Rio do Anil,20,0.045134
+27,Sub bacia do Rio do Anil,23,0.015718
+28,Sub bacia do Rio Guerenguê,10,0.438116
+28,Sub bacia do Rio Guerenguê,15,0.414990
+28,Sub bacia do Rio Guerenguê,13,0.146894
+29,Sub bacia da Zona dos Canais,6,0.515187
+29,Sub bacia da Zona dos Canais,8,0.399322
+29,Sub bacia da Zona dos Canais,7,0.061737
+29,Sub bacia da Zona dos Canais,10,0.021224
+29,Sub bacia da Zona dos Canais,4,0.002530
+30,Sub bacia do Rio da Cachoeira,20,0.714149
+30,Sub bacia do Rio da Cachoeira,11,0.257560
+30,Sub bacia do Rio da Cachoeira,22,0.022981
+30,Sub bacia do Rio da Cachoeira,23,0.005310
+31,Sub bacia do Rio dos Passarinhos,10,0.930563
+31,Sub bacia do Rio dos Passarinhos,15,0.069437
+32,Sub bacia do Rio Camorim e Caçambé,10,0.755254
+32,Sub bacia do Rio Camorim e Caçambé,8,0.244746
+33,Sub bacia da Lagoa Rodrigo de Freitas,29,0.563807
+33,Sub bacia da Lagoa Rodrigo de Freitas,22,0.200462
+33,Sub bacia da Lagoa Rodrigo de Freitas,28,0.102923
+33,Sub bacia da Lagoa Rodrigo de Freitas,26,0.047838
+33,Sub bacia da Lagoa Rodrigo de Freitas,27,0.035085
+33,Sub bacia da Lagoa Rodrigo de Freitas,25,0.022760
+33,Sub bacia da Lagoa Rodrigo de Freitas,20,0.020260
+33,Sub bacia da Lagoa Rodrigo de Freitas,32,0.006865
+34,Micro bacia da Praia Vermelha,33,1.000000
+35,Sub bacia do Rio das Pedras,15,0.381385
+35,Sub bacia do Rio das Pedras,20,0.306449
+35,Sub bacia do Rio das Pedras,11,0.257160
+35,Sub bacia do Rio das Pedras,14,0.055005
+36,Micro bacia de Copacabana,28,0.574607
+36,Micro bacia de Copacabana,33,0.404192
+36,Micro bacia de Copacabana,32,0.021200
+37,Restinga da Barra,10,0.390376
+37,Restinga da Barra,8,0.382630
+37,Restinga da Barra,11,0.153501
+37,Restinga da Barra,6,0.066708
+37,Restinga da Barra,15,0.006785
+38,Micro bacia do Rio Muzema,11,1.000000
+39,Sub bacia de São Conrado,22,0.583021
+39,Sub bacia de São Conrado,11,0.275889
+39,Sub bacia de São Conrado,20,0.140155
+39,Sub bacia de São Conrado,26,0.000935
+40,Micro bacia do Vidigal,26,0.659457
+40,Micro bacia do Vidigal,22,0.340543
+41,Micro bacia do Rio da Barra,11,1.000000
+42,Sub bacia de Grumari,6,0.794729
+42,Sub bacia de Grumari,2,0.205271
+43,Micro bacia da Prainha,6,1.000000
+44,Micro bacia da Joatinga,11,1.000000
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,9,0.251065
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,16,0.224115
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,7,0.210484
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,12,0.167439
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,13,0.109425
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,17,0.022681
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,21,0.014789
+45,Sub bacia dos Rios Acari/Pavuna/Meriti,14,0.000002
+46,Sub bacia do Rio Irajá/Canal da Penha,21,0.727017
+46,Sub bacia do Rio Irajá/Canal da Penha,16,0.153502
+46,Sub bacia do Rio Irajá/Canal da Penha,12,0.118878
+46,Sub bacia do Rio Irajá/Canal da Penha,17,0.000604
+47,Sub bacia do Rio Sarapuí,7,0.951005
+47,Sub bacia do Rio Sarapuí,5,0.048915
+47,Sub bacia do Rio Sarapuí,4,0.000079
+48,Sub bacia do Rio Ramos,21,0.913797
+48,Sub bacia do Rio Ramos,24,0.076052
+48,Sub bacia do Rio Ramos,19,0.010152
+49,Sub bacia do Canal do Cunha,19,0.311396
+49,Sub bacia do Canal do Cunha,24,0.210497
+49,Sub bacia do Canal do Cunha,17,0.208742
+49,Sub bacia do Canal do Cunha,23,0.113417
+49,Sub bacia do Canal do Cunha,21,0.070238
+49,Sub bacia do Canal do Cunha,14,0.052875
+49,Sub bacia do Canal do Cunha,12,0.032159
+49,Sub bacia do Canal do Cunha,31,0.000596
+49,Sub bacia do Canal do Cunha,25,0.000079
+50,Micro bacia do Centro,31,0.751300
+50,Micro bacia do Centro,30,0.173932
+50,Micro bacia do Centro,32,0.074768
+51,Sub bacia do Canal do Mangue,25,0.269034
+51,Sub bacia do Canal do Mangue,23,0.188338
+51,Sub bacia do Canal do Mangue,27,0.177633
+51,Sub bacia do Canal do Mangue,24,0.138160
+51,Sub bacia do Canal do Mangue,30,0.103318
+51,Sub bacia do Canal do Mangue,20,0.087400
+51,Sub bacia do Canal do Mangue,31,0.036117
+52,Sub bacia do Rio Carioca,32,0.451076
+52,Sub bacia do Rio Carioca,30,0.331819
+52,Sub bacia do Rio Carioca,27,0.217104
+53,Sub bacia de Botafogo,32,0.894830
+53,Sub bacia de Botafogo,33,0.102008
+53,Sub bacia de Botafogo,29,0.001839
+53,Sub bacia de Botafogo,27,0.001323
+54,Micro bacia da Urca,33,0.999995
+54,Micro bacia da Urca,32,0.000005
+55,Micro bacia da Praia de Fora,33,1.000000
