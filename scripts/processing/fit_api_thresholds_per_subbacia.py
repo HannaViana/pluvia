@@ -45,6 +45,11 @@ GRID_C_SIZE = 50
 B_MIN = -1.0
 B_MAX = -0.01
 
+# K grid search
+K_VALUES = [0.60, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+DAILY_API_VALUES_PATH = f'{INPUT_DIR}/daily_api_values_subbacia.csv'
+REFERENCE_K = 0.85  # K used when the stored API values were originally computed
+
 
 # ==============================================================================
 # FUNCTIONS (identical to fit_api_thresholds_per_station.py)
@@ -147,7 +152,75 @@ def evaluate_full_system(events_df, intensity_col, upper_tol, lower_tol,
     return compute_metrics(y_true, y_pred)
 
 
-def fit_subbacia_timestep(subbacia_events, ts_col, ts_label):
+def reconstruct_composite_from_api(api_df, k=REFERENCE_K):
+    """
+    Back-calculate the sub-bacia daily composite precipitation from stored API values.
+
+    The stored API was computed as:
+        API_n(t) = sum_{i=1}^{n} K^i * P(t-i)
+
+    Inverting this recurrence:
+        P(t-i) = (API_i(t) - API_{i-1}(t)) / K^i   where API_0 = 0
+
+    This recovers the exact weighted daily precipitation for every antecedent day
+    of every event, including days with < MIN_DAILY_RAINFALL_MM that were excluded
+    from daily_peak_intensities_subbacia.csv.
+
+    Returns DataFrame with columns: shi_cd, date, daily_total_mm
+    """
+    records = {}  # {(shi_cd, date): list of estimates}
+
+    for _, row in api_df.iterrows():
+        shi_cd = row['shi_cd']
+        event_date = pd.Timestamp(row['date'])
+
+        prev_api = 0.0
+        for i in range(1, MAX_ANTECEDENT_DAYS + 1):
+            api_col = f'api_{i}d'
+            if api_col not in row.index or pd.isna(row[api_col]):
+                break
+            curr_api = float(row[api_col])
+            p_i = max(0.0, (curr_api - prev_api) / (k ** i))
+            antecedent_date = (event_date - pd.Timedelta(days=i)).date()
+            key = (shi_cd, antecedent_date)
+            if key not in records:
+                records[key] = []
+            records[key].append(p_i)
+            prev_api = curr_api
+
+    rows = [
+        {'shi_cd': key[0], 'date': key[1], 'daily_total_mm': float(np.mean(vals))}
+        for key, vals in records.items()
+    ]
+    return pd.DataFrame(rows)
+
+
+def compute_api_for_k(events_df, daily_df, k):
+    """
+    Compute API_n (n = 1..MAX_ANTECEDENT_DAYS) for a given decay coefficient K.
+    Uses daily_df (daily_total_mm per date) as precipitation source.
+    Returns events_df with added columns _api_k_{n}d.
+    """
+    daily_df = daily_df[['date', 'daily_total_mm']].copy()
+    daily_df['date'] = pd.to_datetime(daily_df['date'])
+    precip_map = dict(zip(daily_df['date'], daily_df['daily_total_mm'].fillna(0.0)))
+
+    result = events_df.copy()
+    dates = pd.to_datetime(result['date']).values
+
+    for n_days in range(1, MAX_ANTECEDENT_DAYS + 1):
+        api_values = np.zeros(len(dates))
+        for i in range(1, n_days + 1):
+            shifted = pd.to_datetime(dates) - pd.Timedelta(days=i)
+            api_values += (k ** i) * np.array(
+                [precip_map.get(pd.Timestamp(d), 0.0) for d in shifted]
+            )
+        result[f'_api_k_{n_days}d'] = api_values
+
+    return result
+
+
+def fit_subbacia_timestep(subbacia_events, ts_col, ts_label, subbacia_daily_df):
     """Fit all thresholds for one sub-bacia x time-step combination."""
     valid_mask = subbacia_events[ts_col].notna()
     ts_events = subbacia_events[valid_mask].copy()
@@ -160,6 +233,7 @@ def fit_subbacia_timestep(subbacia_events, ts_col, ts_label):
         'POD_upper_tol': np.nan, 'FAR_upper_tol': np.nan, 'PPV_upper_tol': np.nan,
         'POD_lower_tol': np.nan, 'FAR_lower_tol': np.nan, 'PPV_lower_tol': np.nan,
         'best_antecedent_days': 0,
+        'best_k': np.nan,
         'a': np.nan, 'b': np.nan, 'c': np.nan,
         'POD_api': np.nan, 'FAR_api': np.nan, 'PPV_api': np.nan,
     }
@@ -192,6 +266,7 @@ def fit_subbacia_timestep(subbacia_events, ts_col, ts_label):
 
     best_api_result = None
     best_api_days = 0
+    best_api_k = np.nan
     best_api_score = -np.inf
     detailed = []
 
@@ -199,48 +274,53 @@ def fit_subbacia_timestep(subbacia_events, ts_col, ts_label):
     middle_events = ts_events[middle_mask]
 
     if len(middle_events) >= 10:
-        for n_days in range(1, MAX_ANTECEDENT_DAYS + 1):
-            api_col = f'api_{n_days}d'
-            if api_col not in middle_events.columns:
-                continue
+        for k in K_VALUES:
+            # Compute API with this K for the relevant event subsets
+            middle_with_api = compute_api_for_k(middle_events, subbacia_daily_df, k)
+            ts_with_api = compute_api_for_k(ts_events, subbacia_daily_df, k)
 
-            valid_api = middle_events[api_col].notna()
-            me = middle_events[valid_api]
+            for n_days in range(1, MAX_ANTECEDENT_DAYS + 1):
+                api_col = f'_api_k_{n_days}d'
 
-            if len(me) < 5:
-                continue
+                valid_api = middle_with_api[api_col].notna()
+                me = middle_with_api[valid_api]
 
-            y_middle = (me['classificacao'] == 'EA').astype(int)
-            if y_middle.sum() < 2 or (y_middle == 0).sum() < 2:
-                continue
+                if len(me) < 5:
+                    continue
 
-            result = fit_exponential_curve(me[ts_col], me[api_col], y_middle)
+                y_middle = (me['classificacao'] == 'EA').astype(int)
+                if y_middle.sum() < 2 or (y_middle == 0).sum() < 2:
+                    continue
 
-            if not np.isnan(result['a']):
-                full_valid = ts_events[ts_events[api_col].notna()]
-                full_metrics = evaluate_full_system(
-                    full_valid, ts_col, upper_tol, lower_tol,
-                    api_col, result['a'], result['b'], result['c']
-                )
-                result['full_POD'] = full_metrics['POD']
-                result['full_FAR'] = full_metrics['FAR']
-                result['full_PPV'] = full_metrics['PPV']
-            else:
-                result['full_POD'] = np.nan
-                result['full_FAR'] = np.nan
-                result['full_PPV'] = np.nan
+                result = fit_exponential_curve(me[ts_col], me[api_col], y_middle)
 
-            detailed.append({
-                'time_step': ts_label,
-                'time_step_col': ts_col,
-                'antecedent_days': n_days,
-                **result
-            })
+                if not np.isnan(result['a']):
+                    full_valid = ts_with_api[ts_with_api[api_col].notna()]
+                    full_metrics = evaluate_full_system(
+                        full_valid, ts_col, upper_tol, lower_tol,
+                        api_col, result['a'], result['b'], result['c']
+                    )
+                    result['full_POD'] = full_metrics['POD']
+                    result['full_FAR'] = full_metrics['FAR']
+                    result['full_PPV'] = full_metrics['PPV']
+                else:
+                    result['full_POD'] = np.nan
+                    result['full_FAR'] = np.nan
+                    result['full_PPV'] = np.nan
 
-            if result['score'] > best_api_score:
-                best_api_score = result['score']
-                best_api_result = result
-                best_api_days = n_days
+                detailed.append({
+                    'time_step': ts_label,
+                    'time_step_col': ts_col,
+                    'antecedent_days': n_days,
+                    'k': k,
+                    **result
+                })
+
+                if result['score'] > best_api_score:
+                    best_api_score = result['score']
+                    best_api_result = result
+                    best_api_days = n_days
+                    best_api_k = k
 
     if best_api_result is None:
         best_api_result = {'a': np.nan, 'b': np.nan, 'c': np.nan,
@@ -264,6 +344,7 @@ def fit_subbacia_timestep(subbacia_events, ts_col, ts_label):
         'FAR_lower_tol': metrics_lower_tol['FAR'],
         'PPV_lower_tol': metrics_lower_tol['PPV'],
         'best_antecedent_days': best_api_days,
+        'best_k': best_api_k,
         'a': best_api_result['a'],
         'b': best_api_result['b'],
         'c': best_api_result['c'],
@@ -290,6 +371,18 @@ def main():
     print(f"  EA: {(events_df['classificacao'] == 'EA').sum():,}")
     print(f"  ESA: {(events_df['classificacao'] == 'ESA').sum():,}")
 
+    print(f"\nLoading stored API values from {DAILY_API_VALUES_PATH}...")
+    api_values_df = pd.read_csv(DAILY_API_VALUES_PATH)
+    print(f"  Loaded {len(api_values_df):,} sub-bacia x day records")
+
+    print(f"\nReconstructing composite daily precipitation from stored API (reference K={REFERENCE_K})...")
+    daily_df = reconstruct_composite_from_api(api_values_df, k=REFERENCE_K)
+    print(f"  Reconstructed {len(daily_df):,} sub-bacia x day records")
+    composite_path = f'{OUTPUT_DIR}/subbacia_daily_composite_reconstructed.csv'
+    daily_df.to_csv(composite_path, index=False, float_format='%.4f')
+    print(f"  Saved {composite_path}")
+    print(f"  K values to search: {K_VALUES}")
+
     subbacia_ids = sorted(events_df['shi_cd'].unique())
     print(f"  Sub-bacias: {len(subbacia_ids)}")
 
@@ -298,17 +391,18 @@ def main():
 
     for shi_cd in tqdm(subbacia_ids, desc="Sub-bacias"):
         subbacia_events = events_df[events_df['shi_cd'] == shi_cd]
+        subbacia_daily = daily_df[daily_df['shi_cd'] == shi_cd]
         n_ea = (subbacia_events['classificacao'] == 'EA').sum()
         n_esa = (subbacia_events['classificacao'] == 'ESA').sum()
         shi_nm = subbacia_events['shi_nm'].iloc[0] if 'shi_nm' in subbacia_events.columns else ''
 
-        print(f"\n{'─'*60}")
+        print(f"\n{'-'*60}")
         print(f"  Sub-bacia {shi_cd} '{shi_nm}'  (EA={n_ea}, ESA={n_esa}, total={len(subbacia_events)})")
 
         for ts_idx, ts_col in enumerate(TIME_STEP_COLS):
             ts_label = TIME_STEP_LABELS[ts_idx]
 
-            params, detailed = fit_subbacia_timestep(subbacia_events, ts_col, ts_label)
+            params, detailed = fit_subbacia_timestep(subbacia_events, ts_col, ts_label, subbacia_daily)
 
             for d in detailed:
                 d['shi_cd'] = shi_cd
@@ -318,7 +412,7 @@ def main():
             fitted = not np.isnan(params['a'])
             status = (
                 f"a={params['a']:.2f}, b={params['b']:.4f}, c={params['c']:.2f}, "
-                f"days={params['best_antecedent_days']}, "
+                f"days={params['best_antecedent_days']}, K={params['best_k']}, "
                 f"POD={params['POD_api']:.2%}, FAR={params['FAR_api']:.2%}"
                 if fitted else "no curve fitted"
             )
