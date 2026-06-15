@@ -332,6 +332,83 @@ Please refer to docs/charts/charts-reference.md for full context.
 - Color palettes are chosen for colorblind accessibility where possible
 - The project uses ISO 8601 datetime format internally
 
+---
+
+## Chart 24: API Alert Zones per Sub-bacia — Seasonal Thresholds (Fixed K=0.85)
+
+**Source File**: [`scripts/charts/v1/chart_24_api_alert_zones_per_subbacia_fixed_k.py`](scripts/charts/v1/chart_24_api_alert_zones_per_subbacia_fixed_k.py)
+
+**Output Directory**: `results/charts/v1/chart_24_api_alert_zones_per_subbacia_fixed_k/`
+
+**Data Sources**:
+- `data/processed/api_analysis_subbacia/api_analysis_events_subbacia.csv`
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_seasonal_fixed_k.csv`
+
+**Description**: One figure per sub-bacia (2×5 grid, 10 time-steps). Each panel shows all events (EA and ESA) plotted against `api_5d` (5-day antecedent API, K=0.85 fixed). Four pairs of horizontal threshold lines (upper_tol and lower_tol) are drawn for each season in distinct colours. Provides an annual overview of how seasonal thresholds compare relative to the full event cloud.
+
+---
+
+## Chart 25: I-D Thresholds per Sub-bacia — Seasonal (Fixed K=0.85)
+
+**Source File**: [`scripts/charts/v1/chart_25_api_id_thresholds_per_subbacia_fixed_k.py`](scripts/charts/v1/chart_25_api_id_thresholds_per_subbacia_fixed_k.py)
+
+**Output Directory**: `results/charts/v1/chart_25_api_id_thresholds_per_subbacia_fixed_k/`
+
+**Data Sources**:
+- `data/processed/api_analysis_subbacia/api_analysis_events_subbacia.csv`
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_seasonal_fixed_k.csv`
+
+**Description**: One figure per sub-bacia with 2 panels — (a) without tolerance levels and (b) with tolerance levels. EA/ESA events are shown as scatter in log-log intensity × duration space. Four coloured threshold line pairs (upper and lower) are overlaid for each season. Analogous to Chart 20 but adapted for the seasonal fixed-K methodology.
+
+---
+
+## Chart 26: Seasonal Threshold Summary — Fixed K=0.85
+
+**Source File**: [`scripts/charts/v1/chart_26_seasonal_thresholds_fixed_k.py`](scripts/charts/v1/chart_26_seasonal_thresholds_fixed_k.py)
+
+**Output Directory**: `results/charts/v1/chart_26_seasonal_thresholds_fixed_k/`
+
+**Data Sources**:
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_seasonal_fixed_k.csv`
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_per_subbacia.csv` (annual reference)
+
+**Description**: Single summary figure with three panels:
+- **(a)** Bar chart of mean POD / FAR / Score by season, with annual reference dashed lines.
+- **(b)** Box plot of lower_tol distribution by season and time-step (log scale), with annual mean line per duration.
+- **(c)** Stacked bar of best antecedent days (1–10) distribution by season — replaces the K-distribution panel from Chart 21 since K is fixed.
+
+Analogous to Chart 21 but for the fixed-K seasonal methodology.
+
+---
+
+## Chart 27: I-D Thresholds by Season per Sub-bacia — Fixed K=0.85
+
+**Source File**: [`scripts/charts/v1/chart_27_seasonal_id_thresholds_per_subbacia_fixed_k.py`](scripts/charts/v1/chart_27_seasonal_id_thresholds_per_subbacia_fixed_k.py)
+
+**Output Directory**: `results/charts/v1/chart_27_seasonal_id_thresholds_fixed_k/`
+
+**Data Sources**:
+- `data/processed/api_analysis_subbacia/api_analysis_events_subbacia.csv`
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_seasonal_fixed_k.csv`
+
+**Description**: One figure per sub-bacia with 4 panels (one per season). Each panel shows EA/ESA scatter in log-log intensity × duration space, overlaid with upper_tol and lower_tol lines for that season. Structure is identical to Chart 22; only the parameter source changes.
+
+---
+
+## Chart 28: API Alert Zones by Season per Sub-bacia — Fixed K=0.85
+
+**Source File**: [`scripts/charts/v1/chart_28_seasonal_alert_zones_per_subbacia_fixed_k.py`](scripts/charts/v1/chart_28_seasonal_alert_zones_per_subbacia_fixed_k.py)
+
+**Output Directory**: `results/charts/v1/chart_28_seasonal_alert_zones_fixed_k/`
+
+**Data Sources**:
+- `data/processed/api_analysis_subbacia/api_analysis_events_subbacia.csv`
+- `data/processed/api_analysis_subbacia/api_threshold_parameters_seasonal_fixed_k.csv`
+
+**Description**: One large figure per sub-bacia with a 10×4 grid (rows = time-steps, columns = seasons). Each cell shows the API × intensity scatter for that season with four alert zones (red/orange/yellow/blue fills) and the fitted exponential curve I = a·exp(b·API) + c. API values are read directly from pre-computed `api_{n}d` columns in the events CSV (no K recomputation). Analogous to Chart 23 but uses fixed K=0.85 implicitly via the pre-computed columns.
+
+---
+
 ## Last Updated
 
-2025-12-20
+2026-06-08
